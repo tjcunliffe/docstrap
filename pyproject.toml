@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "docstrap"
-version = "0.1.0"
+version = "0.1.1"
 description = "A tool for bootstrapping and managing documentation project structures"
-authors = ["Tom <tom@example.com>"]  # Replace with your actual email
-readme = "README.md"
+authors = ["Tom Cunliffe <tom.cunliffe@onoclea.io>"]
 license = "MIT"
-homepage = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
-repository = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
-documentation = "https://github.com/yourusername/docstrap"  # Replace with your actual docs URL
+homepage = "https://github.com/tjcunliffe/docstrap"
+repository = "https://github.com/tjcunliffe/docstrap"
+documentation = "https://github.com/tjcunliffe/docstrap"
 keywords = ["documentation", "bootstrap", "scaffold", "structure", "generator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
