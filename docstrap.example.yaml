@@ -1,36 +1,37 @@
-# This is a template configuration file for docstrap.
-# Customize this file according to your documentation needs.
+# Example configuration file for docstrap
+# Copy this file to docstrap.yaml and customize according to your needs
 
-# Documentation directory name (change this to your preferred docs directory name)
+# Documentation directory name
 # Can be set to "." to create files in the project root, or any subdirectory name like "docs"
 docs_dir: "docs"
 
-# Enable/disable numbered prefixes (010_, 020_, etc.)
-use_numbered_prefix: false
+# Enable numbered prefixes (010_, 020_, etc.)
+use_numbered_prefix: true
 
-# Enable/disable markdown h1 headings in .md files
+# Add markdown h1 headings in .md files
 use_markdown_headings: true
 
-# Numbering configuration (only used if use_numbered_prefix is true)
+# Numbering configuration
 initial_prefix: 10  # Start with 010
 dir_start_prefix: 20  # Start with 020
 prefix_step: 10  # Increment by 10
 padding_width: 3  # For 010, 020, etc.
 
 # Directory and file structure
-# Uncomment and modify the sections below according to your needs
-directories: []
-  # Example structure (remove the # to use):
-  # - sections:
-  #     - overview.md
-  #     - details.md
-  # - guides:
-  #     - setup.md
-  # - references:
-  #     - api.md
+# Each directory can contain a list of files
+directories:
+  guides:
+    - getting-started.md
+    - configuration.md
+    - advanced-usage.md
+  reference:
+    - api.md
+    - cli.md
+  examples:
+    - basic.md
+    - advanced.md
 
-# Top-level files
-top_level_files: []
-  # Example files (remove the # to use):
-  # - index.md
-  # - README.md
+# Top-level files (files in the docs_dir root)
+top_level_files:
+  - index.md
+  - README.md
