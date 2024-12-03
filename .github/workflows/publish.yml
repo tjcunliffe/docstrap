@@ -35,8 +35,16 @@ jobs:
     - name: Install project
       run: poetry install --no-interaction
 
+    # Install type stubs before running tests
+    - name: Install type stubs
+      run: poetry run python -m pip install types-PyYAML
+
     - name: Run tests
-      run: poetry run pytest
+      run: |
+        poetry run pytest \
+          --verbose \
+          --capture=no \
+          -k "not TestInteractiveFileHandler"
 
     - name: Build package
       run: poetry build

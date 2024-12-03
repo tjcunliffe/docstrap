@@ -2,11 +2,12 @@
 name = "docstrap"
 version = "0.1.0"
 description = "A tool for bootstrapping and managing documentation project structures"
-authors = ["Tom Cunliffe <tom.cunliffe@onoclea.io>"]
+authors = ["Tom <tom@example.com>"]  # Replace with your actual email
+readme = "README.md"
 license = "MIT"
-homepage = "https://github.com/tjcunliffe/docstrap"
-repository = "https://github.com/tjcunliffe/docstrap"
-documentation = "https://github.com/tjcunliffe/docstrap"
+homepage = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
+repository = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
+documentation = "https://github.com/yourusername/docstrap"  # Replace with your actual docs URL
 keywords = ["documentation", "bootstrap", "scaffold", "structure", "generator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -40,6 +41,7 @@ isort = "^5.12.0"
 mypy = "^1.7.1"
 pylint = "^3.0.2"
 pre-commit = "^3.6.0"
+types-PyYAML = "^6.0.12.12"
 
 [build-system]
 requires = ["poetry-core"]
