@@ -1,6 +1,6 @@
 # DocStrap
 
-A tool for managing structured documentation hierarchies.
+A tool for creating structured documentation hierarchies.
 
 ## Installation
 
