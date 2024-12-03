@@ -7,6 +7,7 @@ license = "MIT"
 homepage = "https://github.com/tjcunliffe/docstrap"
 repository = "https://github.com/tjcunliffe/docstrap"
 documentation = "https://github.com/tjcunliffe/docstrap"
+readme = "README.md"
 keywords = ["documentation", "bootstrap", "scaffold", "structure", "generator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
