@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .config import load_config
 from .config.models import DocumentationError
+from .config.template import STARTER_CONFIG
 from .core.manager import DocumentationManager
 from .fs.handler import (
     DryRunFileHandler,
@@ -45,51 +46,85 @@ def create_parser() -> argparse.ArgumentParser:
         description="docstrap - Bootstrap and manage documentation directory structures"
     )
 
-    parser.add_argument(
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
+
+    # Init command
+    init_parser = subparsers.add_parser(
+        "init", help="Generate a starter configuration file"
+    )
+    init_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Overwrite existing configuration file",
+    )
+
+    # Create command
+    structure_parser = subparsers.add_parser(
+        "create", help="Create documentation structure"
+    )
+    structure_parser.add_argument(
         "-c",
         "--config",
         type=str,
         required=True,
-        help="Path to configuration file (e.g., config/docstrap.yaml)",
+        help="Path to configuration file (e.g., docstrap.yaml)",
     )
-
-    parser.add_argument(
+    structure_parser.add_argument(
         "-d",
         "--directory",
         type=str,
         help="Project root directory (default: current directory)",
     )
-
-    parser.add_argument(
+    structure_parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Show what would be done without making changes",
     )
-
-    parser.add_argument(
+    structure_parser.add_argument(
         "-y", "--yes", action="store_true", help="Answer yes to all prompts"
     )
-
-    parser.add_argument(
+    structure_parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose output"
     )
 
     return parser
 
 
-def main() -> int:
+def init_config(force: bool = False) -> int:
     """
-    Main entry point for the CLI.
+    Generate a starter configuration file.
+
+    Args:
+        force: Whether to overwrite existing configuration.
 
     Returns:
         int: Exit code (0 for success, non-zero for error).
     """
-    parser = create_parser()
-    args = parser.parse_args()
+    config_path = Path("docstrap.yaml")
+    if config_path.exists() and not force:
+        logging.error("Configuration file already exists. Use -f to overwrite.")
+        return 1
 
-    # Configure logging
-    setup_logging(args.verbose)
+    try:
+        config_path.write_text(STARTER_CONFIG)
+        logging.info("Created configuration file: %s", config_path)
+        return 0
+    except OSError as e:
+        logging.error("Error creating configuration file: %s", e)
+        return 1
 
+
+def create_structure(args: argparse.Namespace) -> int:
+    """
+    Create documentation structure based on configuration.
+
+    Args:
+        args: Command line arguments.
+
+    Returns:
+        int: Exit code (0 for success, non-zero for error).
+    """
     try:
         # Load configuration
         config = load_config(args.config)
@@ -131,6 +166,29 @@ def main() -> int:
         if args.verbose:
             traceback.print_exc()
         return 1
+
+
+def main() -> int:
+    """
+    Main entry point for the CLI.
+
+    Returns:
+        int: Exit code (0 for success, non-zero for error).
+    """
+    parser = create_parser()
+    args = parser.parse_args()
+
+    # Configure logging
+    setup_logging(getattr(args, "verbose", False))
+
+    # Handle commands
+    if args.command == "init":
+        return init_config(args.force)
+    if args.command == "create":
+        return create_structure(args)
+
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":

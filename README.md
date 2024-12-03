@@ -19,21 +19,31 @@ poetry add docstrap
 
 ### CLI
 
+Generate a starter configuration:
+```bash
+# Create a new docstrap.yaml with defaults
+docstrap init
+
+# Overwrite existing config
+docstrap init -f
+```
+
+Create documentation structure:
 ```bash
 # Create structure using config
-docstrap -c config.yaml
+docstrap create -c docstrap.yaml
 
 # Create in specific directory
-docstrap -c config.yaml -d /path/to/project
+docstrap create -c docstrap.yaml -d /path/to/project
 
 # Preview changes without making them
-docstrap -c config.yaml --dry-run
+docstrap create -c docstrap.yaml --dry-run
 
 # Skip confirmation prompts
-docstrap -c config.yaml -y
+docstrap create -c docstrap.yaml -y
 
 # Enable verbose output
-docstrap -c config.yaml -v
+docstrap create -c docstrap.yaml -v
 ```
 
 ### Library
@@ -43,7 +53,7 @@ from pathlib import Path
 from docstrap import DocumentationManager, StructureConfig, SilentFileHandler
 
 # Load config from YAML
-config = StructureConfig.from_yaml("config.yaml")
+config = StructureConfig.from_yaml("docstrap.yaml")
 
 # Or create programmatically
 config = StructureConfig(
@@ -74,6 +84,13 @@ manager.create_structure(Path("/path/to/project"))  # Optional path
 
 ### Configuration
 
+The easiest way to get started is to generate a config file:
+```bash
+docstrap init
+```
+
+This creates a `docstrap.yaml` with sensible defaults that you can customize:
+
 ```yaml
 # Documentation directory (use "." for project root)
 docs_dir: "docs"
@@ -92,14 +109,14 @@ padding_width: 3  # For 010, 020, etc.
 
 # Directory structure
 directories:
-  - guides:
-      - getting-started.md
-      - configuration.md
-  - reference:
-      - api.md
-  - examples:
-      - basic.md
-      - advanced.md
+  guides:
+    - getting-started.md
+    - configuration.md
+  reference:
+    - api.md
+  examples:
+    - basic.md
+    - advanced.md
 
 # Top-level files
 top_level_files:
