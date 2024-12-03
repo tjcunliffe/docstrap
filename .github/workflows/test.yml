@@ -24,12 +24,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry==1.7.1
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
+    - name: Cache Poetry dependencies
       uses: actions/cache@v3
       with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        path: |
+          ~/.cache/pypoetry
+          .venv
+        key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
 
     - name: Configure Poetry
       run: |
@@ -37,7 +38,6 @@ jobs:
         poetry config virtualenvs.in-project true
 
     - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
 
     - name: Install project

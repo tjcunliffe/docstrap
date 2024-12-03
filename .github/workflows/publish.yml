@@ -24,6 +24,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry==1.7.1
 
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pypoetry
+          .venv
+        key: poetry-${{ runner.os }}-3.9-${{ hashFiles('poetry.lock') }}
+
     - name: Configure Poetry
       run: |
         poetry config virtualenvs.create true
