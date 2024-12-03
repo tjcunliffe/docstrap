@@ -93,7 +93,12 @@ class InteractiveFileHandler(FileHandler):
         try:
             if path.exists():
                 logger.info("File exists: %s", path)
-                response = input("Overwrite? (y/N): ").strip().lower()
+                try:
+                    response = input("Overwrite? (y/N): ").strip().lower()
+                except (KeyboardInterrupt, EOFError):
+                    logger.info("\nSkipping file creation")
+                    return
+
                 if response != "y":
                     logger.info("Skipping file creation")
                     return
@@ -109,7 +114,12 @@ class InteractiveFileHandler(FileHandler):
         try:
             if path.exists():
                 logger.info("Remove file: %s", path)
-                response = input("Proceed? (y/N): ").strip().lower()
+                try:
+                    response = input("Proceed? (y/N): ").strip().lower()
+                except (KeyboardInterrupt, EOFError):
+                    logger.info("\nSkipping file removal")
+                    return
+
                 if response != "y":
                     logger.info("Skipping file removal")
                     return
@@ -123,7 +133,12 @@ class InteractiveFileHandler(FileHandler):
         try:
             if path.exists():
                 logger.info("Remove directory: %s", path)
-                response = input("Proceed? (y/N): ").strip().lower()
+                try:
+                    response = input("Proceed? (y/N): ").strip().lower()
+                except (KeyboardInterrupt, EOFError):
+                    logger.info("\nSkipping directory removal")
+                    return
+
                 if response != "y":
                     logger.info("Skipping directory removal")
                     return
