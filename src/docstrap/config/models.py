@@ -7,16 +7,17 @@ configuration loaded from YAML files.
 """
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Dict, List
+
 
 class DocumentationError(Exception):
     """Raised when there's an error in the documentation configuration."""
-    pass
+
 
 @dataclass
 class NumberingConfig:
     """Configuration for file/directory numbering."""
+
     enabled: bool
     initial_prefix: int
     dir_start_prefix: int
@@ -24,20 +25,22 @@ class NumberingConfig:
     padding_width: int
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'NumberingConfig':
+    def from_dict(cls, data: dict) -> "NumberingConfig":
         """Create NumberingConfig from dictionary."""
         try:
             return cls(
-                enabled=data['use_numbered_prefix'],
-                initial_prefix=data['initial_prefix'],
-                dir_start_prefix=data['dir_start_prefix'],
-                prefix_step=data['prefix_step'],
-                padding_width=data['padding_width']
+                enabled=data["use_numbered_prefix"],
+                initial_prefix=data["initial_prefix"],
+                dir_start_prefix=data["dir_start_prefix"],
+                prefix_step=data["prefix_step"],
+                padding_width=data["padding_width"],
             )
         except KeyError as e:
-            raise DocumentationError(f"Missing required numbering configuration: {e}")
+            raise DocumentationError(
+                f"Missing required numbering configuration: {e}"
+            ) from e
         except (ValueError, TypeError) as e:
-            raise DocumentationError(f"Invalid numbering configuration: {e}")
+            raise DocumentationError(f"Invalid numbering configuration: {e}") from e
 
     def validate(self) -> None:
         """Validate the numbering configuration."""
@@ -50,92 +53,107 @@ class NumberingConfig:
         if self.padding_width < 1:
             raise DocumentationError("padding_width must be positive")
 
+
 @dataclass
 class DocumentStructure:
     """Configuration for documentation directory structure."""
+
     directories: Dict[str, List[str]]
     top_level_files: List[str]
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'DocumentStructure':
+    def from_dict(cls, data: dict) -> "DocumentStructure":
         """Create DocumentStructure from dictionary."""
         try:
-            if not isinstance(data.get('directories'), dict):
+            if not isinstance(data.get("directories"), dict):
                 raise DocumentationError("directories must be a dictionary")
-            
+
             directories = {}
-            for dir_name, files in data['directories'].items():
+            for dir_name, files in data["directories"].items():
                 if not isinstance(files, list):
-                    raise DocumentationError(f"Directory contents must be a list for {dir_name}")
+                    raise DocumentationError(
+                        f"Directory contents must be a list for {dir_name}"
+                    )
                 directories[dir_name] = files
 
             return cls(
-                directories=directories,
-                top_level_files=data.get('top_level_files', [])
+                directories=directories, top_level_files=data.get("top_level_files", [])
             )
         except KeyError as e:
-            raise DocumentationError(f"Missing required directory configuration: {e}")
+            raise DocumentationError(
+                f"Missing required directory configuration: {e}"
+            ) from e
         except (ValueError, TypeError) as e:
-            raise DocumentationError(f"Invalid directory configuration: {e}")
+            raise DocumentationError(f"Invalid directory configuration: {e}") from e
 
     def validate(self) -> None:
         """Validate the directory structure configuration."""
         if not self.directories:
             raise DocumentationError("At least one directory must be configured")
-        
+
         for dir_name, files in self.directories.items():
             if not isinstance(dir_name, str) or not dir_name:
                 raise DocumentationError(f"Invalid directory name: {dir_name}")
-            if '/' in dir_name or '\\' in dir_name:
-                raise DocumentationError("Directory names cannot contain path separators")
+            if "/" in dir_name or "\\" in dir_name:
+                raise DocumentationError(
+                    "Directory names cannot contain path separators"
+                )
             if not isinstance(files, list):
-                raise DocumentationError(f"Files for directory {dir_name} must be a list")
+                raise DocumentationError(
+                    f"Files for directory {dir_name} must be a list"
+                )
             for file in files:
                 if not isinstance(file, str) or not file:
                     raise DocumentationError(f"Invalid file name in {dir_name}: {file}")
-                if '/' in file or '\\' in file:
-                    raise DocumentationError("File names cannot contain path separators")
+                if "/" in file or "\\" in file:
+                    raise DocumentationError(
+                        "File names cannot contain path separators"
+                    )
 
         if not isinstance(self.top_level_files, list):
             raise DocumentationError("top_level_files must be a list")
         for file in self.top_level_files:
             if not isinstance(file, str) or not file:
                 raise DocumentationError(f"Invalid top-level file name: {file}")
-            if '/' in file or '\\' in file:
+            if "/" in file or "\\" in file:
                 raise DocumentationError("File names cannot contain path separators")
+
 
 @dataclass
 class StructureConfig:
     """Complete documentation structure configuration."""
+
     docs_dir: str
     numbering: NumberingConfig
     structure: DocumentStructure
     use_markdown_headings: bool
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'StructureConfig':
+    def from_dict(cls, data: dict) -> "StructureConfig":
         """Create StructureConfig from dictionary."""
         try:
-            docs_dir = data.get('docs_dir', data.get('base_dir'))  # Support both new and old config names
+            docs_dir = data.get("docs_dir", data.get("base_dir"))
             if docs_dir is None:
                 raise DocumentationError("Missing required configuration: docs_dir")
-                
+
             if not isinstance(docs_dir, str):
                 raise DocumentationError("docs_dir must be a string")
-                
-            if '/' in docs_dir or '\\' in docs_dir:
-                raise DocumentationError("Documentation directory name cannot contain path separators")
-                
+
+            if "/" in docs_dir or "\\" in docs_dir:
+                raise DocumentationError(
+                    "Documentation directory name cannot contain path separators"
+                )
+
             return cls(
                 docs_dir=docs_dir,
                 numbering=NumberingConfig.from_dict(data),
                 structure=DocumentStructure.from_dict(data),
-                use_markdown_headings=data['use_markdown_headings']
+                use_markdown_headings=data["use_markdown_headings"],
             )
         except KeyError as e:
-            raise DocumentationError(f"Missing required configuration key: {e}")
+            raise DocumentationError(f"Missing required configuration key: {e}") from e
         except (ValueError, TypeError) as e:
-            raise DocumentationError(f"Invalid configuration: {e}")
+            raise DocumentationError(f"Invalid configuration: {e}") from e
 
     def validate(self) -> None:
         """Validate the complete configuration."""
@@ -145,7 +163,7 @@ class StructureConfig:
             raise DocumentationError("docs_dir cannot be empty")
         if not isinstance(self.use_markdown_headings, bool):
             raise DocumentationError("use_markdown_headings must be a boolean")
-        
+
         # Validate sub-configurations
         self.numbering.validate()
         self.structure.validate()

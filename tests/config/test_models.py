@@ -1,7 +1,9 @@
 """Tests for the configuration models."""
 
 import pytest
-from docstrap.config.models import StructureConfig, DocumentationError
+
+from docstrap.config.models import DocumentationError, StructureConfig
+
 
 def test_valid_config_creation():
     """Test creating a valid configuration object."""
@@ -15,17 +17,18 @@ def test_valid_config_creation():
         "padding_width": 3,
         "directories": {
             "guides": ["getting-started.md"],
-            "reference": ["api-reference.md"]
+            "reference": ["api-reference.md"],
         },
-        "top_level_files": ["index.md"]
+        "top_level_files": ["index.md"],
     }
-    
+
     config = StructureConfig.from_dict(config_dict)
     assert config.docs_dir == "docs"
     assert config.numbering.enabled is True
     assert isinstance(config.structure.directories, dict)
     assert len(config.structure.directories) == 2
     assert isinstance(config.structure.top_level_files, list)
+
 
 def test_backward_compatibility():
     """Test that old base_dir config still works."""
@@ -37,14 +40,13 @@ def test_backward_compatibility():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "guides": ["getting-started.md"]
-        },
-        "top_level_files": ["index.md"]
+        "directories": {"guides": ["getting-started.md"]},
+        "top_level_files": ["index.md"],
     }
-    
+
     config = StructureConfig.from_dict(config_dict)
     assert config.docs_dir == "docs"
+
 
 def test_dot_docs_dir():
     """Test that '.' is a valid docs_dir value."""
@@ -56,15 +58,14 @@ def test_dot_docs_dir():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "guides": []
-        },
-        "top_level_files": []
+        "directories": {"guides": []},
+        "top_level_files": [],
     }
-    
+
     config = StructureConfig.from_dict(config_dict)
     assert config.docs_dir == "."
     config.validate()  # Should not raise any exceptions
+
 
 def test_invalid_prefix_step():
     """Test configuration with invalid prefix step."""
@@ -76,15 +77,14 @@ def test_invalid_prefix_step():
         "dir_start_prefix": 20,
         "prefix_step": 0,  # Invalid: should be positive
         "padding_width": 3,
-        "directories": {
-            "guides": []
-        },
-        "top_level_files": []
+        "directories": {"guides": []},
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict).validate()
     assert "prefix_step must be positive" in str(exc_info.value)
+
 
 def test_invalid_padding_width():
     """Test configuration with invalid padding width."""
@@ -96,15 +96,14 @@ def test_invalid_padding_width():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 0,  # Invalid: should be positive
-        "directories": {
-            "guides": []
-        },
-        "top_level_files": []
+        "directories": {"guides": []},
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict).validate()
     assert "padding_width must be positive" in str(exc_info.value)
+
 
 def test_invalid_directory_structure():
     """Test configuration with invalid directory structure."""
@@ -116,15 +115,14 @@ def test_invalid_directory_structure():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "guides": 123  # Invalid: should be a list
-        },
-        "top_level_files": []
+        "directories": {"guides": 123},  # Invalid: should be a list
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict)
     assert "Directory contents must be a list" in str(exc_info.value)
+
 
 def test_invalid_file_names():
     """Test configuration with invalid file names."""
@@ -139,12 +137,13 @@ def test_invalid_file_names():
         "directories": {
             "guides": ["invalid/file/path.md"]  # Invalid: contains path separators
         },
-        "top_level_files": []
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict).validate()
     assert "File names cannot contain path separators" in str(exc_info.value)
+
 
 def test_empty_config():
     """Test configuration with minimal valid settings."""
@@ -156,14 +155,13 @@ def test_empty_config():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "guides": []  # At least one directory required
-        },
-        "top_level_files": []
+        "directories": {"guides": []},  # At least one directory required
+        "top_level_files": [],
     }
-    
+
     config = StructureConfig.from_dict(config_dict)
     config.validate()  # Should not raise any exceptions
+
 
 def test_directory_name_validation():
     """Test validation of directory names."""
@@ -175,15 +173,14 @@ def test_directory_name_validation():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "invalid/dir/name": []  # Invalid: contains path separators
-        },
-        "top_level_files": []
+        "directories": {"invalid/dir/name": []},  # Invalid: contains path separators
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict).validate()
     assert "Directory names cannot contain path separators" in str(exc_info.value)
+
 
 def test_missing_docs_dir():
     """Test that missing docs_dir raises appropriate error."""
@@ -194,12 +191,10 @@ def test_missing_docs_dir():
         "dir_start_prefix": 20,
         "prefix_step": 10,
         "padding_width": 3,
-        "directories": {
-            "guides": []
-        },
-        "top_level_files": []
+        "directories": {"guides": []},
+        "top_level_files": [],
     }
-    
+
     with pytest.raises(DocumentationError) as exc_info:
         StructureConfig.from_dict(config_dict)
     assert "Missing required configuration: docs_dir" in str(exc_info.value)

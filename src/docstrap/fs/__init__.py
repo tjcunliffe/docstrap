@@ -1,12 +1,17 @@
 """File system operations module for docstrap."""
 
-from .handler import FileHandler, InteractiveFileHandler, SilentFileHandler, DryRunFileHandler
+from .handler import (
+    DryRunFileHandler,
+    FileHandler,
+    InteractiveFileHandler,
+    SilentFileHandler,
+)
 from .migrator import DirectoryMigrator
 
 __all__ = [
-    'FileHandler',
-    'InteractiveFileHandler',
-    'SilentFileHandler',
-    'DryRunFileHandler',
-    'DirectoryMigrator'
+    "FileHandler",
+    "InteractiveFileHandler",
+    "SilentFileHandler",
+    "DryRunFileHandler",
+    "DirectoryMigrator",
 ]

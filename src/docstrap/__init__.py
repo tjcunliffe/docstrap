@@ -6,18 +6,23 @@ documentation structures with support for numbered prefixes, markdown headings,
 and configurable directory layouts.
 """
 
-from .config import StructureConfig, DocumentationError
+from .config import DocumentationError, StructureConfig
 from .core import DocumentationManager
-from .fs import FileHandler, InteractiveFileHandler, SilentFileHandler, DryRunFileHandler
+from .fs import (
+    DryRunFileHandler,
+    FileHandler,
+    InteractiveFileHandler,
+    SilentFileHandler,
+)
 
 __version__ = "0.1.0"
 
 __all__ = [
-    'StructureConfig',
-    'DocumentationError',
-    'DocumentationManager',
-    'FileHandler',
-    'InteractiveFileHandler',
-    'SilentFileHandler',
-    'DryRunFileHandler'
+    "StructureConfig",
+    "DocumentationError",
+    "DocumentationManager",
+    "FileHandler",
+    "InteractiveFileHandler",
+    "SilentFileHandler",
+    "DryRunFileHandler",
 ]

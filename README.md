@@ -146,13 +146,16 @@ git clone https://github.com/yourusername/docstrap.git
 cd docstrap
 poetry install
 
+# Setup pre-commit hooks
+poetry run pre-commit install
+
 # Test
 poetry run pytest
 
-# Lint
+# Lint (also run automatically on commit)
 poetry run black .
 poetry run isort .
-poetry run mypy .
+poetry run mypy src/docstrap
 poetry run pylint src/docstrap
 ```
 

@@ -1,53 +1,54 @@
 """
-Configuration loader for docstrap.
+Configuration loading functionality for docstrap.
 
-This module handles loading and validating configuration from YAML files.
+This module provides functionality for loading and validating
+configuration from YAML files.
 """
 
+import logging
 from pathlib import Path
-from typing import Union
+
 import yaml
-from yaml.error import YAMLError
 
-from .models import StructureConfig, DocumentationError
+from .models import DocumentationError, StructureConfig
 
-def load_config(config_path: Union[str, Path]) -> StructureConfig:
+logger = logging.getLogger(__name__)
+
+
+def load_config(config_path: str) -> StructureConfig:
     """
     Load and validate configuration from a YAML file.
-    
+
     Args:
-        config_path: Path to the YAML configuration file.
-        
+        config_path: Path to the configuration file.
+
     Returns:
         StructureConfig: Validated configuration object.
-        
+
     Raises:
-        DocumentationError: If the configuration file is invalid or missing.
+        DocumentationError: If there's an error loading or validating the config.
     """
+    path = Path(config_path)
+
+    # Check if file exists
+    if not path.exists():
+        raise DocumentationError("Configuration file not found")
+
+    # Load YAML content
     try:
-        config_path = Path(config_path)
-        
-        # If path is not absolute, make it relative to current working directory
-        if not config_path.is_absolute():
-            config_path = Path.cwd() / config_path
-            
-        if not config_path.exists():
-            raise DocumentationError(f"Configuration file not found: {config_path}")
-            
-        with open(config_path, 'r') as f:
-            try:
-                data = yaml.safe_load(f)
-            except YAMLError as e:
-                raise DocumentationError(f"Error parsing YAML file: {e}")
-                
-        if not isinstance(data, dict):
-            raise DocumentationError("Configuration must be a YAML dictionary")
-            
+        with path.open(encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        raise DocumentationError(f"Error parsing YAML file: {e}") from e
+
+    # Validate basic structure
+    if not isinstance(data, dict):
+        raise DocumentationError("Configuration must be a YAML dictionary")
+
+    # Create and validate config object
+    try:
         config = StructureConfig.from_dict(data)
         config.validate()
         return config
-        
-    except Exception as e:
-        if not isinstance(e, DocumentationError):
-            raise DocumentationError(f"Error loading configuration: {e}")
-        raise
+    except DocumentationError as e:
+        raise DocumentationError(f"Error loading configuration: {e}") from e
