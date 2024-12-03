@@ -2,21 +2,37 @@
 name = "docstrap"
 version = "0.1.0"
 description = "A tool for bootstrapping and managing documentation project structures"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Tom <tom@example.com>"]  # Replace with your actual email
 readme = "README.md"
-packages = [{include = "docstrap", from = "src"}]
+license = "MIT"
+homepage = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
+repository = "https://github.com/yourusername/docstrap"  # Replace with your actual repo URL
+documentation = "https://github.com/yourusername/docstrap"  # Replace with your actual docs URL
 keywords = ["documentation", "bootstrap", "scaffold", "structure", "generator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Documentation",
     "Topic :: Software Development :: Documentation",
-    "Topic :: Software Development :: Libraries :: Python Modules"
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
+packages = [
+    { include = "docstrap", from = "src" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 pyyaml = "^6.0.1"
+types-PyYAML = "^6.0.12.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
