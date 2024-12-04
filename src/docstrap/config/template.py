@@ -5,7 +5,7 @@ STARTER_CONFIG = """\
 docs_dir: "docs"
 
 # File naming options
-use_numbered_prefix: true
+use_numbered_prefix: false
 use_markdown_headings: true
 
 # Numbering settings
@@ -23,4 +23,18 @@ directories:
 
 top_level_files:
   - index.md
+
+# MkDocs configuration
+generate_mkdocs: false  # Set to true to generate mkdocs.yaml
+mkdocs_config:
+  site_name: "My Documentation"
+  theme:
+    name: "material"  # Using mkdocs-material theme
+  repo_url: ""  # Optional: Add your repository URL
+  markdown_extensions:
+    - toc:
+        permalink: true
+    - admonition
+    - pymdownx.highlight
+    - pymdownx.superfences
 """

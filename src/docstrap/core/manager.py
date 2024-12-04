@@ -143,19 +143,14 @@ class DocumentationManager:
 
     def _create_top_level_files(self, docs_dir: Path) -> None:
         """
-        Create top-level files including README.
+        Create top-level files.
 
         Args:
             docs_dir: Documentation directory for the structure.
         """
         logger.info("Creating top-level files...")
 
-        # Create README without prefix (always unnumbered)
-        readme_path = docs_dir / "README.md"
-        if not readme_path.exists():
-            self.file_handler.create(readme_path)
-
-        # Create other top-level files
+        # Create configured top-level files
         for idx, file in enumerate(self.config.structure.top_level_files, start=1):
             self._create_file(docs_dir, file, idx)
 

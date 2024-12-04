@@ -59,6 +59,8 @@ def basic_config():
             top_level_files=["index.md"],
         ),
         use_markdown_headings=True,
+        generate_mkdocs=False,
+        mkdocs=None,
     )
 
 
@@ -79,6 +81,8 @@ def numbered_config():
             top_level_files=["index.md"],
         ),
         use_markdown_headings=True,
+        generate_mkdocs=False,
+        mkdocs=None,
     )
 
 
@@ -99,6 +103,8 @@ def dot_config():
             top_level_files=["index.md"],
         ),
         use_markdown_headings=True,
+        generate_mkdocs=False,
+        mkdocs=None,
     )
 
 
