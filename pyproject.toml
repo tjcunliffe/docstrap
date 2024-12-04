@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docstrap"
-version = "0.1.1"
+version = "0.0.0"  # Placeholder version for dynamic versioning
 description = "A tool for bootstrapping and managing documentation project structures"
 authors = ["Tom Cunliffe <tom.cunliffe@onoclea.io>"]
 license = "MIT"
@@ -33,6 +33,7 @@ packages = [
 python = "^3.9"
 pyyaml = "^6.0.1"
 types-PyYAML = "^6.0.12.12"
+poetry = "^1.8.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
@@ -46,8 +47,14 @@ mkdocs = "^1.5.3"
 mkdocs-material = "^9.4.14"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core>=1.0.0",
+    "poetry-dynamic-versioning>=1.0.0,<2.0.0"
+]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
 
 [tool.poetry.scripts]
 docstrap = "docstrap.cli:main"
