@@ -25,8 +25,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
 
+      - name: Install Poetry Plugins
+        run: |
+          poetry self add "poetry-dynamic-versioning[plugin]"
+
       - name: Install Dependencies
-        run: poetry install --no-dev
+        run: poetry install --only main
 
       - name: Build the Package
         run: poetry build
@@ -34,4 +38,4 @@ jobs:
       - name: Publish to PyPI
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-        run: poetry publish --build
+        run: poetry publish --build -vvv
