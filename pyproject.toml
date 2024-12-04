@@ -1,10 +1,11 @@
 [build-system]
-requires = [ "poetry-core",]
+requires = ["poetry-core", "setuptools>=45", "setuptools-scm[toml]>=6.2"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "docstrap"
-version = "v0.1.1"
+version = "0.0.0"
+dynamic = ["version"]
 description = "A tool for bootstrapping and managing documentation project structures"
 authors = [ "Tom Cunliffe <tom.cunliffe@onoclea.io>",]
 license = "MIT"
@@ -17,6 +18,9 @@ classifiers = [ "Development Status :: 3 - Alpha", "Environment :: Console", "In
 [[tool.poetry.packages]]
 include = "docstrap"
 from = "src"
+
+[tool.setuptools_scm]
+write_to = "src/docstrap/_version.py"
 
 [tool.black]
 line-length = 88
@@ -45,6 +49,7 @@ warn_unreachable = true
 python = "^3.9"
 pyyaml = "^6.0.1"
 types-PyYAML = "^6.0.12.12"
+setuptools-scm = "^8.0.0"
 
 [tool.poetry.scripts]
 docstrap = "docstrap.cli:main"
