@@ -8,6 +8,9 @@ on:
 jobs:
   tag-publish:
     runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write  # Required for trusted publishing
 
     steps:
       - name: Check out the repository
@@ -29,13 +32,23 @@ jobs:
         run: |
           poetry self add "poetry-dynamic-versioning[plugin]"
 
-      - name: Install Dependencies
-        run: poetry install --only main
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
 
-      - name: Build the Package
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run tests
+        run: |
+          poetry run pytest \
+            --verbose \
+            --capture=no \
+            -k "not TestInteractiveFileHandler"
+
+      - name: Build package
         run: poetry build
 
-      - name: Publish to PyPI
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-        run: poetry publish --build -vvv
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
