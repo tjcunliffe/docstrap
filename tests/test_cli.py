@@ -43,9 +43,20 @@ def test_create_parser() -> None:
     assert not args.dry_run
     assert not args.yes
     assert not args.verbose
+    assert not args.mkdocs
 
     args = parser.parse_args(
-        ["create", "-c", "config.yaml", "-d", "project", "--dry-run", "-y", "-v"]
+        [
+            "create",
+            "-c",
+            "config.yaml",
+            "-d",
+            "project",
+            "--dry-run",
+            "-y",
+            "-v",
+            "--mkdocs",
+        ]
     )
     assert args.command == "create"
     assert args.config == "config.yaml"
@@ -53,6 +64,7 @@ def test_create_parser() -> None:
     assert args.dry_run
     assert args.yes
     assert args.verbose
+    assert args.mkdocs
 
 
 def test_init_config(tmp_path: Path) -> None:
@@ -98,7 +110,12 @@ def test_create_structure_handlers(tmp_path: Path) -> None:
 
     # Test with dry run
     args = argparse.Namespace(
-        config=str(config_path), directory=None, dry_run=True, yes=False, verbose=False
+        config=str(config_path),
+        directory=None,
+        dry_run=True,
+        yes=False,
+        verbose=False,
+        mkdocs=False,
     )
     with patch("docstrap.cli.DocumentationManager") as mock_manager:
         assert create_structure(args) == 0
@@ -121,12 +138,60 @@ def test_create_structure_handlers(tmp_path: Path) -> None:
         assert isinstance(manager_instance, InteractiveFileHandler)
 
 
+def test_create_structure_with_mkdocs(tmp_path: Path) -> None:
+    """Test create_structure with MkDocs configuration."""
+    config_path = tmp_path / "docstrap.yaml"
+    config_path.write_text(STARTER_CONFIG)
+
+    # Test with mkdocs flag
+    args = argparse.Namespace(
+        config=str(config_path),
+        directory=None,
+        dry_run=False,
+        yes=True,
+        verbose=False,
+        mkdocs=True,
+    )
+
+    with (
+        patch("docstrap.cli.DocumentationManager") as mock_manager,
+        patch("docstrap.cli.generate_mkdocs_config") as mock_mkdocs,
+    ):
+        assert create_structure(args) == 0
+        mock_mkdocs.assert_called_once()
+
+    # Test with generate_mkdocs in config
+    args.mkdocs = False
+    with (
+        patch("docstrap.cli.load_config", return_value={"generate_mkdocs": True}),
+        patch("docstrap.cli.DocumentationManager") as mock_manager,
+        patch("docstrap.cli.generate_mkdocs_config") as mock_mkdocs,
+    ):
+        assert create_structure(args) == 0
+        mock_mkdocs.assert_called_once()
+
+    # Test mkdocs generation error
+    with (
+        patch("docstrap.cli.load_config", return_value={"generate_mkdocs": True}),
+        patch("docstrap.cli.DocumentationManager") as mock_manager,
+        patch(
+            "docstrap.cli.generate_mkdocs_config", side_effect=Exception("test error")
+        ),
+    ):
+        assert create_structure(args) == 1
+
+
 def test_create_structure_error_handling(tmp_path: Path) -> None:
     """Test error handling in create_structure."""
     config_path = tmp_path / "docstrap.yaml"
     config_path.write_text(STARTER_CONFIG)
     args = argparse.Namespace(
-        config=str(config_path), directory=None, dry_run=False, yes=False, verbose=True
+        config=str(config_path),
+        directory=None,
+        dry_run=False,
+        yes=False,
+        verbose=True,
+        mkdocs=False,
     )
 
     # Test DocumentationError
@@ -205,6 +270,7 @@ def test_create_structure_custom_directory(tmp_path: Path) -> None:
         dry_run=False,
         yes=False,
         verbose=False,
+        mkdocs=False,
     )
 
     with patch("docstrap.cli.DocumentationManager") as mock_manager:

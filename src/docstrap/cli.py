@@ -10,11 +10,13 @@ import logging
 import sys
 import traceback
 from pathlib import Path
+from typing import Optional
 
 from .config import load_config
-from .config.models import DocumentationError
+from .config.models import DocumentationError, StructureConfig
 from .config.template import STARTER_CONFIG
 from .core.manager import DocumentationManager
+from .core.mkdocs import generate_mkdocs_config
 from .fs.handler import (
     DryRunFileHandler,
     FileHandler,
@@ -87,6 +89,11 @@ def create_parser() -> argparse.ArgumentParser:
     structure_parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose output"
     )
+    structure_parser.add_argument(
+        "--mkdocs",
+        action="store_true",
+        help="Generate mkdocs.yaml regardless of config setting",
+    )
 
     return parser
 
@@ -115,6 +122,30 @@ def init_config(force: bool = False) -> int:
         return 1
 
 
+def handle_mkdocs_generation(
+    config: StructureConfig, project_root: Path, verbose: bool
+) -> Optional[int]:
+    """Handle MkDocs configuration generation.
+
+    Args:
+        config: The docstrap configuration
+        project_root: Project root directory
+        verbose: Whether to show verbose output
+
+    Returns:
+        Optional[int]: Exit code if error occurred, None if successful
+    """
+    try:
+        generate_mkdocs_config(config, project_root)
+        logging.info("Generated mkdocs.yaml")
+        return None
+    except ValueError as e:
+        logging.error("Error generating mkdocs.yaml: %s", e)
+        if verbose:
+            traceback.print_exc()
+        return 1
+
+
 def create_structure(args: argparse.Namespace) -> int:
     """
     Create documentation structure based on configuration.
@@ -130,10 +161,7 @@ def create_structure(args: argparse.Namespace) -> int:
         config = load_config(args.config)
 
         # Determine project root
-        if args.directory:
-            project_root = Path(args.directory)
-        else:
-            project_root = Path.cwd()
+        project_root = Path(args.directory) if args.directory else Path.cwd()
 
         # Select appropriate file handler
         handler: FileHandler
@@ -147,6 +175,12 @@ def create_structure(args: argparse.Namespace) -> int:
         # Create and run the manager
         manager = DocumentationManager(config, handler)
         manager.create_structure(project_root)
+
+        # Generate MkDocs configuration if requested
+        if args.mkdocs or config.generate_mkdocs:
+            result = handle_mkdocs_generation(config, project_root, args.verbose)
+            if result is not None:
+                return result
 
         return 0
 

@@ -7,7 +7,7 @@ configuration loaded from YAML files.
 """
 
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 class DocumentationError(Exception):
@@ -120,6 +120,33 @@ class DocumentStructure:
 
 
 @dataclass
+class MkDocsConfig:
+    """Configuration for MkDocs."""
+
+    site_name: str
+    theme: Dict[str, str]
+    repo_url: Optional[str] = None
+    markdown_extensions: Optional[List[str]] = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Optional["MkDocsConfig"]:
+        """Create MkDocsConfig from dictionary."""
+        mkdocs_data = data.get("mkdocs_config")
+        if not mkdocs_data:
+            return None
+
+        try:
+            return cls(
+                site_name=mkdocs_data.get("site_name", "Documentation"),
+                theme=mkdocs_data.get("theme", {"name": "material"}),
+                repo_url=mkdocs_data.get("repo_url"),
+                markdown_extensions=mkdocs_data.get("markdown_extensions"),
+            )
+        except (ValueError, TypeError) as e:
+            raise DocumentationError(f"Invalid MkDocs configuration: {e}") from e
+
+
+@dataclass
 class StructureConfig:
     """Complete documentation structure configuration."""
 
@@ -127,6 +154,8 @@ class StructureConfig:
     numbering: NumberingConfig
     structure: DocumentStructure
     use_markdown_headings: bool
+    generate_mkdocs: bool
+    mkdocs: Optional[MkDocsConfig]
 
     @classmethod
     def from_dict(cls, data: dict) -> "StructureConfig":
@@ -149,6 +178,8 @@ class StructureConfig:
                 numbering=NumberingConfig.from_dict(data),
                 structure=DocumentStructure.from_dict(data),
                 use_markdown_headings=data["use_markdown_headings"],
+                generate_mkdocs=data.get("generate_mkdocs", False),
+                mkdocs=MkDocsConfig.from_dict(data),
             )
         except KeyError as e:
             raise DocumentationError(f"Missing required configuration key: {e}") from e
@@ -163,6 +194,8 @@ class StructureConfig:
             raise DocumentationError("docs_dir cannot be empty")
         if not isinstance(self.use_markdown_headings, bool):
             raise DocumentationError("use_markdown_headings must be a boolean")
+        if not isinstance(self.generate_mkdocs, bool):
+            raise DocumentationError("generate_mkdocs must be a boolean")
 
         # Validate sub-configurations
         self.numbering.validate()
