@@ -27,12 +27,12 @@ def _generate_nav_structure(config: StructureConfig) -> List[NavItem]:
     # Add top-level files first
     for file in config.structure.top_level_files:
         name = Path(file).stem
+        # Remove numbered prefix if used
+        if config.numbering.enabled and name[0].isdigit():
+            name = name[name.find("_") + 1 :]
         if name.lower() == "index":
             nav.append({"Home": f"{file}"})
         else:
-            # Remove numbered prefix if used
-            if config.numbering.enabled and name[0].isdigit():
-                name = name[name.find("_") + 1 :]
             nav.append({name.replace("-", " ").title(): f"{file}"})
 
     # Add directory sections

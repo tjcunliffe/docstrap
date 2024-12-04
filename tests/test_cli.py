@@ -14,7 +14,13 @@ from docstrap.cli import (
     main,
     setup_logging,
 )
-from docstrap.config.models import DocumentationError
+from docstrap.config.models import (
+    DocumentationError,
+    DocumentStructure,
+    MkDocsConfig,
+    NumberingConfig,
+    StructureConfig,
+)
 from docstrap.config.template import STARTER_CONFIG
 from docstrap.fs.handler import (
     DryRunFileHandler,
@@ -153,9 +159,33 @@ def test_create_structure_with_mkdocs(tmp_path: Path) -> None:
         mkdocs=True,
     )
 
+    test_config = StructureConfig(
+        docs_dir="docs",
+        numbering=NumberingConfig(
+            enabled=False,
+            initial_prefix=10,
+            dir_start_prefix=20,
+            prefix_step=10,
+            padding_width=3,
+        ),
+        structure=DocumentStructure(
+            directories={"guides": ["getting-started.md"]},
+            top_level_files=["index.md"],
+        ),
+        use_markdown_headings=True,
+        generate_mkdocs=True,
+        mkdocs=MkDocsConfig(
+            site_name="Test Docs",
+            theme={"name": "material"},
+            repo_url=None,
+            markdown_extensions=None,
+        ),
+    )
+
     with (
         patch("docstrap.cli.DocumentationManager") as mock_manager,
         patch("docstrap.cli.generate_mkdocs_config") as mock_mkdocs,
+        patch("docstrap.cli.load_config", return_value=test_config),
     ):
         assert create_structure(args) == 0
         mock_mkdocs.assert_called_once()
@@ -163,7 +193,7 @@ def test_create_structure_with_mkdocs(tmp_path: Path) -> None:
     # Test with generate_mkdocs in config
     args.mkdocs = False
     with (
-        patch("docstrap.cli.load_config", return_value={"generate_mkdocs": True}),
+        patch("docstrap.cli.load_config", return_value=test_config),
         patch("docstrap.cli.DocumentationManager") as mock_manager,
         patch("docstrap.cli.generate_mkdocs_config") as mock_mkdocs,
     ):
@@ -172,10 +202,11 @@ def test_create_structure_with_mkdocs(tmp_path: Path) -> None:
 
     # Test mkdocs generation error
     with (
-        patch("docstrap.cli.load_config", return_value={"generate_mkdocs": True}),
+        patch("docstrap.cli.load_config", return_value=test_config),
         patch("docstrap.cli.DocumentationManager") as mock_manager,
         patch(
-            "docstrap.cli.generate_mkdocs_config", side_effect=Exception("test error")
+            "docstrap.cli.generate_mkdocs_config",
+            side_effect=ValueError("test error"),
         ),
     ):
         assert create_structure(args) == 1
