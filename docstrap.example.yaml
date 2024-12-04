@@ -6,7 +6,7 @@
 docs_dir: "docs"
 
 # Enable numbered prefixes (010_, 020_, etc.)
-use_numbered_prefix: true
+use_numbered_prefix: false
 
 # Add markdown h1 headings in .md files
 use_markdown_headings: true
@@ -34,4 +34,3 @@ directories:
 # Top-level files (files in the docs_dir root)
 top_level_files:
   - index.md
-  - README.md
