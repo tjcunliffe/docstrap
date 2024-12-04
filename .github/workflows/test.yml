@@ -9,12 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
 
     steps:
     - uses: actions/checkout@v4
 
-    # Add a step to check if Python files changed
     - name: Check for Python file changes
       id: check_files
       uses: dorny/paths-filter@v3
@@ -79,7 +78,6 @@ jobs:
           --disable=C0111,R0903 \
           --max-line-length=88
 
-    # Run tests only when Python files change
     - name: Run tests
       if: steps.check_files.outputs.python == 'true'
       run: |
