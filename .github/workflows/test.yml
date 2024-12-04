@@ -14,33 +14,49 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # Add a step to check if Python files changed
+    - name: Check for Python file changes
+      id: check_files
+      uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          python:
+            - '**/*.py'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+
     - name: Set up Python ${{ matrix.python-version }}
+      if: steps.check_files.outputs.python == 'true'
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install Poetry
+      if: steps.check_files.outputs.python == 'true'
       run: |
         python -m pip install --upgrade pip
         pip install poetry
 
     - name: Configure Poetry
+      if: steps.check_files.outputs.python == 'true'
       run: |
         poetry config virtualenvs.create true
         poetry config virtualenvs.in-project true
 
     - name: Install dependencies
+      if: steps.check_files.outputs.python == 'true'
       run: poetry install --no-interaction
 
-    # Run formatters first to ensure consistent code style
     - name: Run black
+      if: steps.check_files.outputs.python == 'true'
       run: poetry run black . --check
 
     - name: Run isort
+      if: steps.check_files.outputs.python == 'true'
       run: poetry run isort . --check-only --profile black
 
-    # Run type checking and linting after formatting
     - name: Run mypy
+      if: steps.check_files.outputs.python == 'true'
       run: |
         poetry run mypy src/docstrap \
           --python-version=3.9 \
@@ -57,13 +73,15 @@ jobs:
           --warn-unreachable
 
     - name: Run pylint
+      if: steps.check_files.outputs.python == 'true'
       run: |
         poetry run pylint src/docstrap \
           --disable=C0111,R0903 \
           --max-line-length=88
 
-    # Run tests last since they depend on all previous steps
+    # Run tests only when Python files change
     - name: Run tests
+      if: steps.check_files.outputs.python == 'true'
       run: |
         poetry run pytest \
           --verbose \
